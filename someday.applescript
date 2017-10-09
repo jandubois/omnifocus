@@ -1,26 +1,13 @@
+property onHold : " (On Hold)"
+
 tell application "OmniFocus"
 	tell content of document window 1 of default document
-		set onHold to " (On Hold)"
+		set theTaskList to get the value of the selected trees
+		tell me to run script (alias ((path to me as text) & "::move-selection.applescript"))
 
-		set theTreeList to the selected trees
-
-		# Set selection to the first sibling task following the current selection.
-		# Or the last task preceding, if there are no following sibling tasks.
-		set theFirstTree to the first item of the selected trees
-		set theLastTree to the last item of the selected trees
-		if the (count of theLastTree's following siblings) > 0 then
-			set selected of the first item of theLastTree's following siblings to true
-		else if the (count of theFirstTree's preceding siblings) > 0 then
-			set selected of the last item of theFirstTree's preceding siblings to true
-		end if
-
-		repeat with theTree in the reverse of theTreeList
-			# Deselect task to be moved
-			set theTree's selected to false
-
-			set theTask to get the value of theTree
-			set theProject to the containing project of theTask
-			set theName to the name of theProject
+		repeat with theTask in the reverse of theTaskList
+			set theProject to the theTask's containing project
+			set theName to theProject's name
 
 			# Find the "on hold" project name for the "active" project (or vice versa)
 			if theName ends with onHold then
@@ -30,16 +17,16 @@ tell application "OmniFocus"
 			end if
 
 			# Move task to other project (if it exists)
-			set theFolder to the folder of theProject
+			set theFolder to theProject's folder
 			if exists theFolder's project named theOtherName then
 				set theOtherProject to theFolder's project named theOtherName
 				if theOtherName ends with onHold then
-					move theTask to the beginning of the tasks of theOtherProject
+					move theTask to the beginning of theOtherProject's tasks
 					set theTask's flagged to false
 					set theTask's defer date to missing value
 					set theTask's due date to missing value
 				else
-					move theTask to the end of the tasks of theOtherProject
+					move theTask to the end of theOtherProject's tasks
 				end if
 			else
 				display dialog "Project \"" & theOtherName & "\" does not exist" with title "Toggle Someday" buttons {"Ok"}
