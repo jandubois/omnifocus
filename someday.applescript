@@ -35,6 +35,9 @@ tell application "OmniFocus"
 				set theOtherProject to theFolder's project named theOtherName
 				if theOtherName ends with onHold then
 					move theTask to the beginning of the tasks of theOtherProject
+					set theTask's flagged to false
+					set theTask's defer date to missing value
+					set theTask's due date to missing value
 				else
 					move theTask to the end of the tasks of theOtherProject
 				end if
