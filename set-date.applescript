@@ -22,6 +22,9 @@ on run theArgs
 
 	tell application "OmniFocus" to tell the content of document window 1 of the default document
 		set theTaskList to get the value of the selected trees
+		if theDateType is "due" then
+			tell me to run script (alias ((path to me as text) & "::move-selection.applescript"))
+		end if
 		repeat with theTask in theTaskList
 			# Set time of day for defer/due tasks, depending on work/not-work, and on weekday
 			if theNewDate is not the missing value then
