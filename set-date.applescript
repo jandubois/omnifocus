@@ -9,12 +9,9 @@ on run theArgs
 		# clear the date
 		set theNewDate to the missing value
 	else if theWeekday is "t" then
-		if theDateType is "due" then
-			set theNewDate to today
-		else
-			# defer to tomorrow
-			set theNewDate to today + 1 * days
-		end if
+		set theNewDate to today + 1 * days
+	else if theWeekday is "y" then
+		set theNewDate to today
 	else
 		# theWeekday is "1".."7" for Monday to Sunday; map to AppleScript weekday value
 		set theDesiredWeekday to (8 + theWeekday as number) mod 7
