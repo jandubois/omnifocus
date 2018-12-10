@@ -65,9 +65,9 @@ on run theArgs
 
 			# Update due or defer date to new (or missing) value
 			if theDateType is "due" then
-				set the theTask's due date to theNewDate
+				set theTask's due date to theNewDate
 			else
-				set the theTask's defer date to theNewDate
+				set theTask's defer date to theNewDate
 			end if
 			if theWeekday is "l" then
 				set theTask's flagged to true

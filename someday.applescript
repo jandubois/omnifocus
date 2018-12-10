@@ -6,7 +6,7 @@ tell application "OmniFocus"
 		tell me to run script (alias ((path to me as text) & "::move-selection.applescript"))
 
 		repeat with theTask in the reverse of theTaskList
-			set theProject to the theTask's containing project
+			set theProject to theTask's containing project
 			set theName to theProject's name
 
 			# Find the "on hold" project name for the "active" project (or vice versa)
