@@ -8,6 +8,9 @@ on run theArgs
 	if theWeekday is "c" then
 		# clear the date
 		set theNewDate to the missing value
+	else if theWeekday is "l" then
+		# clear the date and flag the task
+		set theNewDate to the missing value
 	else if theWeekday is "t" then
 		set theNewDate to today + 1 * days
 	else if theWeekday is "y" then
@@ -65,6 +68,9 @@ on run theArgs
 				set the theTask's due date to theNewDate
 			else
 				set the theTask's defer date to theNewDate
+			end if
+			if theWeekday is "l" then
+				set theTask's flagged to true
 			end if
 		end repeat
 	end tell
