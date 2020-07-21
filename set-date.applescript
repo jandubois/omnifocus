@@ -5,11 +5,8 @@ on run theArgs
 	set theWeekday to item 2 of theArgs
 
 	set today to the current date
-	if theWeekday is "c" then
-		# clear the date
-		set theNewDate to the missing value
-	else if theWeekday is "l" then
-		# clear the date and flag the task
+	if theWeekday is in {"c", "l", "h", "r"} then
+		# clear, flag, hold, radar
 		set theNewDate to the missing value
 	else if theWeekday is "t" then
 		set theNewDate to today + 1 * days
@@ -23,12 +20,26 @@ on run theArgs
 		set theNewDate to today + addDays * days
 	end if
 
+	tell application "OmniFocus"
+		set whenTag to item 1 of (tags of default document whose name is "When")
+		set onHoldTag to item 1 of (tags of whenTag whose name is "On Hold")
+		set onRadarTag to item 1 of (tags of whenTag whose name is "On Radar")
+	end tell
+
 	tell application "OmniFocus" to tell the content of document window 1 of the default document
 		set theTaskList to get the value of the selected trees
 		if theDateType is "due" then
 			tell me to run script (alias ((path to me as text) & "::move-selection.applescript"))
 		end if
 		repeat with theTask in theTaskList
+			# Remove "On Hold" and "On Radar" tags from task
+			if (count of (theTask's tags whose name is "On Hold")) > 0 then
+				remove onHoldTag from theTask's tags
+			end if
+			if (count of (theTask's tags whose name is "On Radar")) > 0 then
+				remove onRadarTag from theTask's tags
+			end if
+
 			# Set time of day for defer/due tasks, depending on work/not-work, and on weekday
 			if theNewDate is not the missing value then
 				# Find the top-level folder of the task
@@ -69,9 +80,27 @@ on run theArgs
 			else
 				set theTask's defer date to theNewDate
 			end if
+
+			# Flag, On Hold, and On Radar will clear *both* due and defer dates
+			if theWeekday is in {"l", "h", "r"} then
+				set theTask's due date to the missing value
+				set theTask's defer date to the missing value
+			end if
+
 			if theWeekday is "l" then
+				# On Hold and On Radar tags have already been removed
 				set theTask's flagged to true
 			end if
+
+			if theWeekday is "h" then
+				add onHoldTag to theTask's tags
+				set theTask's flagged to false
+			end if
+			if theWeekday is "r" then
+				add onRadarTag to theTask's tags
+				set theTask's flagged to false
+			end if
+
 		end repeat
 	end tell
 end run
